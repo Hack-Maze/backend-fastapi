@@ -23,14 +23,16 @@ class Category(Model):
     created_at = fields.DatetimeField(auto_now_add=True)
 
 
-class Product(Model):
+class Room(Model):
     categories = fields.ManyToManyField("models.Category")
     name = fields.CharField(max_length=50)
+    title = fields.TextField()
+    description = fields.TextField()
     view_num = fields.IntField(description="View Num")
     sort = fields.IntField()
-    is_reviewed = fields.BooleanField(description="Is Reviewed")
+    is_active = fields.BooleanField(description="Is Active")
     type = fields.IntEnumField(ProductType, description="Product Type")
-    image = fields.CharField(max_length=200)
+    recommended_video = fields.CharField(max_length=200)
     body = fields.TextField()
     created_at = fields.DatetimeField(auto_now_add=True)
 

@@ -2,8 +2,8 @@ from enum import Enum, IntEnum
 
 
 class ProductType(IntEnum):
-    article = 1
-    page = 2
+    Machice = 1
+    Other = 2
 
 
 class Status(IntEnum):

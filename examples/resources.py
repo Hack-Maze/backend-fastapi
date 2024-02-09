@@ -5,7 +5,7 @@ from starlette.requests import Request
 
 from examples import enums
 from examples.constants import BASE_DIR
-from examples.models import Admin, Category, Config, Product
+from examples.models import Admin, Category, Config, Room
 from fastapi_admin.app import app
 from fastapi_admin.enums import Method
 from fastapi_admin.file_upload import FileUpload
@@ -80,8 +80,8 @@ class Content(Dropdown):
         fields = ["id", "name", "slug", "created_at"]
 
     class ProductResource(Model):
-        label = "Product"
-        model = Product
+        label = "Room"
+        model = Room
         filters = [
             filters.Enum(enum=enums.ProductType, name="type", label="ProductType"),
             filters.Datetime(name="created_at", label="CreatedAt"),
@@ -89,11 +89,11 @@ class Content(Dropdown):
         fields = [
             "id",
             "name",
-            "view_num",
-            "sort",
-            "is_reviewed",
+            "title",
+            "description",
+            "is_active",
             "type",
-            Field(name="image", label="Image", display=displays.Image(width="40")),
+            Field(name="recommended_video", label="Video", display=displays.Image(width="40")),
             Field(name="body", label="Body", input_=inputs.Editor()),
             "created_at",
         ]
