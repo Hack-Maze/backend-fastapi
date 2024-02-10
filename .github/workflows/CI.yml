@@ -70,13 +70,15 @@ jobs:
       - name: Set up Python 3.8
         uses: actions/setup-python@v5 
         with:
-          python-version: 3.12 # Modify python version HERE
+          python-version: 3.8 # Modify python version HERE
 
       #Task for installing dependencies, multi-line command
       - name: Install dependencies
         run: |
+         
           pip install --upgrade pip && pip3 install poetry && poetry install --no-root
           python -m pip install pytest
+          pip wheel --no-cache-dir --use-pep517 "uvloop (==0.17.0)"
           poetry install && make compile 
 
 
