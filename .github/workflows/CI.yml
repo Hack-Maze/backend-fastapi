@@ -548,4 +548,3 @@ jobs:
             details: "## > - **backend CI Workflow Finished!**"
             footer: HORRAI.
             webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
-
