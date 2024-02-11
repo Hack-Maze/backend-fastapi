@@ -1,5 +1,4 @@
 # test_math_operations.py
-import pytest
 from operation import add_numbers
 
 def test_add_numbers():
