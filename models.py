@@ -1,10 +1,8 @@
-from typing import List
-
 from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, create_engine
+from sqlalchemy import Boolean, Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, relationship, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
 # endpoints for all models
 

@@ -92,6 +92,8 @@ class Content(Dropdown):
             "title",
             "description",
             "is_active",
+            "view_num",
+            "sort",
             "type",
             Field(name="recommended_video", label="Video", display=displays.Image(width="40")),
             Field(name="body", label="Body", input_=inputs.Editor()),
