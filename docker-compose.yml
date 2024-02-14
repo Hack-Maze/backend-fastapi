@@ -1,7 +1,7 @@
 version: "3"
 services:
   app:
-    build: .
+    build: Dockerfile.dev
     restart: always
     env_file: .env
     network_mode: host
