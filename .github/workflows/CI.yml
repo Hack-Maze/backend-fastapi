@@ -73,6 +73,10 @@ jobs:
         with:
           python-version: 3.8 # Modify python version HERE
 
+
+      - name: Install dependencies
+        run: |
+           echo $ PWD
       #Task for installing dependencies, multi-line command
       - name: Install dependencies
         run: |
