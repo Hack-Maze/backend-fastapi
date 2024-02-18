@@ -74,9 +74,6 @@ jobs:
           python-version: 3.8 # Modify python version HERE
 
 
-      - name: Install dependencies
-        run: |
-           echo $PWD
       #Task for installing dependencies, multi-line command
       - name: Install dependencies
         run: |
@@ -162,7 +159,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_ERRORS: true
-
+        with:
+          args: --path src/backend/app/
 
       - name: notify Backend  lint Stage Succeeded
         uses: rjstone/discord-webhook-notify@v1
@@ -450,6 +448,10 @@ jobs:
         uses: actions/checkout@v4
 
 
+      - name: PWD
+        run: |
+           echo $PWD
+           
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
