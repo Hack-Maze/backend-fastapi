@@ -157,7 +157,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_ERRORS: true
-          FILTER_REGEX_INCLUDE: '^src/backend/'
+          FILTER_REGEX_INCLUDE: '.^src/backend/*'
 
       - name: notify Backend  lint Stage Succeeded
         uses: rjstone/discord-webhook-notify@v1
