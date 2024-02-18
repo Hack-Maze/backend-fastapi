@@ -134,8 +134,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ github.workspace }}/src/backend/app/
-
 
             
     needs: [build-test]
@@ -159,7 +157,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_ERRORS: true
-          SUPER_DIR: src/backend/app/
+          FILTER_REGEX_INCLUDE: '^src/backend'
 
       - name: notify Backend  lint Stage Succeeded
         uses: rjstone/discord-webhook-notify@v1
@@ -450,12 +448,15 @@ jobs:
       - name: PWD
         run: |
            echo $PWD
-           
+      - name: List directory contents
+        run: ls -la 
+        
+        
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ${{ github.workspace }}/src/backend
-          file: ./backend.dockerfile
+          file: ${{ github.workspace }}/src/backend/backend.dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ secrets.DOCKERUSERNAME }}/${{ secrets.DOCKER_REPO }}:latest
