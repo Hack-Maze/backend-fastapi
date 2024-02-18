@@ -76,7 +76,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-           echo $ PWD
+           echo $PWD
       #Task for installing dependencies, multi-line command
       - name: Install dependencies
         run: |
