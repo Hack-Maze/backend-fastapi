@@ -9,8 +9,8 @@ from app.core.config import settings
 def custom_generate_unique_id(route: APIRoute):
     return f"{route.tags[0]}-{route.name}"
 
-root_path = os.getenv('ROOT_PATH', '/api')
-app = FastAPI(root_path=root_path,
+
+app = FastAPI(root_path="/api",
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
