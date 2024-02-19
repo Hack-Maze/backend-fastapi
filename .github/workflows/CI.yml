@@ -133,8 +133,8 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ github.workspace }}/src/backend/app/
 
+        working-directory: ${{ github.workspace }}
 
             
     needs: [build-test]
@@ -158,6 +158,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_ERRORS: true
+
+          FILTER_REGEX_INCLUDE: '.^src/backend/*'
 
 
       - name: notify Backend  lint Stage Succeeded
@@ -417,7 +419,9 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ github.workspace }}/src/backend/
+
+        working-directory: ${{ github.workspace }}/src/backend
+
 
     needs: [analyze-codeQL,analyze-codacy,lint,Trivy-scan]
     steps:
@@ -446,11 +450,13 @@ jobs:
         uses: actions/checkout@v4
 
 
+        
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./backend.dockerfile
+          context: ${{ github.workspace }}/src/backend
+          file: ${{ github.workspace }}/src/backend/backend.dockerfile
+
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ secrets.DOCKERUSERNAME }}/${{ secrets.DOCKER_REPO }}:latest
@@ -551,3 +557,4 @@ jobs:
             details: "## > - **backend CI Workflow Finished!**"
             footer: HORRAI.
             webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
+

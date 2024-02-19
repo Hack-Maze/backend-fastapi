@@ -1,3 +1,4 @@
+[![Codacy Security Scan](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/codacy.yml/badge.svg)](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/codacy.yml) [![CodeQL](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/codeql.yml/badge.svg)](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/codeql.yml) [![fast-CI](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/CI.yml/badge.svg)](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/CI.yml) [![trivy](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/trivy.yml/badge.svg)](https://github.com/Hack-Maze/backend-fastapi/actions/workflows/trivy.yml) 
 # Full Stack FastAPI and PostgreSQL - Base Project Generator
 
 
