@@ -19,7 +19,7 @@ from app.utils import (
 router = APIRouter()
 
 
-@router.post("/login/access-token")
+@router.post("/api/login/access-token")
 def login_access_token(
     session: SessionDep, form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
@@ -41,7 +41,7 @@ def login_access_token(
     )
 
 
-@router.post("/login/test-token", response_model=UserOut)
+@router.post("/api/login/test-token", response_model=UserOut)
 def test_token(current_user: CurrentUser) -> Any:
     """
     Test access token
@@ -49,7 +49,7 @@ def test_token(current_user: CurrentUser) -> Any:
     return current_user
 
 
-@router.post("/password-recovery/{email}")
+@router.post("/api/password-recovery/{email}")
 def recover_password(email: str, session: SessionDep) -> Message:
     """
     Password Recovery
@@ -68,7 +68,7 @@ def recover_password(email: str, session: SessionDep) -> Message:
     return Message(message="Password recovery email sent")
 
 
-@router.post("/reset-password/")
+@router.post("/api/reset-password/")
 def reset_password(session: SessionDep, body: NewPassword) -> Message:
     """
     Reset password
