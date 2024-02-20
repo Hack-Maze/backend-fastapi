@@ -41,6 +41,7 @@ class User(UserBase, table=True):
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner")
     rooms: list["Room"] = Relationship(back_populates="user")
+    publicuser: list["PublicUser"] = Relationship(back_populates="user")
 
 # Properties to return via API, id is always required
 class UserOut(UserBase):
@@ -128,6 +129,68 @@ class Room(RoomBase, table=True):
 
 
 class RoomOut(RoomBase):
+    id: int
+
+
+# do the same for PublicUser {full_name , country , rank, level , bio ,github link ,linkedin link ,personal blog link ,job ,active room , completed rooms ,friends ,badges ,created rooms}
+class PublicUserBase(SQLModel):
+    full_name : str
+    country : str
+    rank :int
+    level :int
+    bio :str
+    github_link: str
+    linkedin_link : str
+    personal_blog_link :str
+    job : str
+    active_room : bool
+    completed_rooms : str
+    friends :str
+    badges : str
+    created_rooms : str
+
+
+class PublicUserCreate(PublicUserBase):
+    full_name : str
+    country : str
+    rank :int
+    level :int
+    bio :str
+    github_link: str
+    linkedin_link : str
+    personal_blog_link :str
+    job : str
+    active_room : bool
+    completed_rooms : str
+    friends :str
+    badges : str
+    created_rooms : str
+
+class PublicUserUpdate(PublicUserBase):
+    full_name: Union[str, None] = None
+    country: Union[str, None] = None
+    rank: Union[int, None] = None
+    level: Union[int, None] = None
+    github_link: Union[str, None] = None
+    linkedin_link: Union[str, None] = None
+    personal_blog_link: Union[str, None] = None
+    job: Union[str, None] = None
+    active_room: Union[bool, None] = None
+    completed_rooms: Union[str, None] = None
+    friends: Union[str, None] = None
+    created_rooms: Union[str, None] = None
+
+
+class PublicUser(PublicUserBase, table=True):
+    id: Union[int, None] = Field(default=None, primary_key=True)
+    full_name: str
+    user_id: Union[int, None] = Field(
+        default=None, foreign_key="user.id", nullable=False
+    )
+    user: Union[User, None] = Relationship(back_populates="publicuser")
+
+
+class PublicUserOut(PublicUserBase):
     id: int
 
 
