@@ -42,6 +42,7 @@ class User(UserBase, table=True):
     items: list["Item"] = Relationship(back_populates="owner")
     rooms: list["Room"] = Relationship(back_populates="user")
     publicuser: list["PublicUser"] = Relationship(back_populates="user")
+    moduel: list["moduel"] = Relationship(back_populates="moduel")
 
 # Properties to return via API, id is always required
 class UserOut(UserBase):
@@ -191,6 +192,52 @@ class PublicUser(PublicUserBase, table=True):
 
 
 class PublicUserOut(PublicUserBase):
+    id: int
+
+
+# do the same for moduel {id, description, title, auther, level, created-at,visibility, collection}
+class ModuleBase(SQLModel):
+    description: Union[str, None] = None
+    title: str
+    level :int
+    auther: str
+    created_at: str
+    visibility: str
+    collection: Union[str, None] = None
+
+
+class ModuleCreate(ModuleBase):
+
+    description: Union[str, None] = None
+    title: str
+    level :int
+    auther: str
+    created_at: str
+    visibility: str
+    collection: Union[str, None] = None
+
+
+class ModuleUpdate(ModuleBase):
+    description: Union[str, None] = None
+    title: Union[str, None] = None
+    level: Union[int, None] = None
+    auther: Union[str, None] = None
+    created_at: Union[str, None] = None
+    visibility: Union[str, None] = None
+    collection: Union[str, None] = None
+    
+
+
+class Module(ModuleBase, table=True):
+    id: Union[int, None] = Field(default=None, primary_key=True)
+    title: str
+    user_id: Union[int, None] = Field(
+        default=None, foreign_key="user.id", nullable=False
+    )
+    user: Union[User, None] = Relationship(back_populates="moduel")
+
+
+class ModuleOut(ModuleBase):
     id: int
 
 
