@@ -1,6 +1,8 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
+FROM  tiangolo/uvicorn-gunicorn-fastapi:python3.10-slim
 
 WORKDIR /app/
+
+RUN apt update -y && apt install curl -y
 
 # Install Poetry
 RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
