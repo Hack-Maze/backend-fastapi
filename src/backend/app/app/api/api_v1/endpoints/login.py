@@ -30,6 +30,7 @@ def login_access_token(
         session=session, email=form_data.username, password=form_data.password
     )
     if not user:
+        # XXX: can we create the user here? (login/signup)
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
