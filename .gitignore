@@ -1,3 +1,6 @@
+__pycache__
+
+app.egg-info
 dev-link/
 docker-stack.yml
 poetry.lock
@@ -8,3 +11,4 @@ testing-project
 .mypy_cache
 .vscode
 .vscode
+*.pyc

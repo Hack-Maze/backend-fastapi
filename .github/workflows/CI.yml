@@ -58,7 +58,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ github.workspace }}/src/backend/app/
+        working-directory: ${{ github.workspace }}/app/
     steps:
 
       - name: short-sha
@@ -163,7 +163,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISABLE_ERRORS: true
 
-          FILTER_REGEX_INCLUDE: '.^src/backend/*'
+          FILTER_REGEX_INCLUDE: '.^app/*'
 
 
       - name: notify Backend  lint Stage Succeeded
@@ -207,7 +207,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ${{ github.workspace }}/src/backend/app/
+        working-directory: ${{ github.workspace }}/app/
 
     needs: [build-test]
     permissions:
@@ -302,7 +302,7 @@ jobs:
       defaults:
         run:
           shell: bash 
-          working-directory: ${{ github.workspace }}/src/backend/app/
+          working-directory: ${{ github.workspace }}/app/
 
       permissions:
         contents: read # for actions/checkout to fetch code
@@ -385,7 +385,7 @@ jobs:
     defaults:
       run:
         shell: bash 
-        working-directory: ${{ github.workspace }}/src/backend/
+        working-directory: ${{ github.workspace }}
     permissions:
       contents: read # for actions/checkout to fetch code
       security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
@@ -424,7 +424,7 @@ jobs:
       run:
         shell: bash
 
-        working-directory: ${{ github.workspace }}/src/backend
+        working-directory: ${{ github.workspace }}/app
 
 
     needs: [Trivy-scan,analyze-codeQL,analyze-codacy,lint]
@@ -458,8 +458,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ${{ github.workspace }}/src/backend
-          file: ${{ github.workspace }}/src/backend/backend.dockerfile
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/backend.dockerfile
 
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
