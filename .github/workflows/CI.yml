@@ -398,7 +398,7 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: |
-          docker build -t docker.io/mostafaewida/hackmaze_backend:${{ github.sha }} -f backend.dockerfile .
+          docker build -t docker.io/mostafaewida/hackmaze_backend:${{ github.sha }} .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@7b7aa264d83dc58691451798b4d117d53d21edfe
         with:
@@ -459,7 +459,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ github.workspace }}
-          file: ${{ github.workspace }}/backend.dockerfile
 
           push: ${{ github.event_name != 'pull_request' }}
           tags: |

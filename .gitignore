@@ -1,14 +1,36 @@
 __pycache__
-
 app.egg-info
-dev-link/
-docker-stack.yml
-poetry.lock
-testing-project
+*.pyc
+.mypy_cache
+.coverage
+htmlcov
+.cache
+.venv
 
 .env
-.mypy_cache
-.mypy_cache
 .vscode
-.vscode
-*.pyc
+.idea
+.ipynb_checkpoints
+.pytest_cache
+dist
+site
+coverage.xml
+.netlify
+test.db
+log.txt
+Pipfile.lock
+env3.*
+env
+docs_build
+site_build
+venv
+docs.zip
+archive.zip
+
+# vim temporary files
+*~
+.*.sw?
+.cache
+
+# macOS
+.DS_Store
