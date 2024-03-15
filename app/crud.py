@@ -3,7 +3,15 @@ from typing import Any
 from sqlmodel import Session, select
 
 from app.core.security import get_password_hash, verify_password
-from app.models import Item, ItemCreate, User, UserCreate, UserUpdate
+from app.models import (
+    Item,
+    ItemCreate,
+    Profile,
+    ProfileCreate,
+    User,
+    UserCreate,
+    UserUpdate,
+)
 
 
 def create_user(*, session: Session, user_create: UserCreate) -> User:
@@ -51,3 +59,18 @@ def create_item(*, session: Session, item_in: ItemCreate, owner_id: int) -> Item
     session.commit()
     session.refresh(db_item)
     return db_item
+
+
+def get_profile_by_user_id(*, session: Session, user_id: int) -> Profile | None:
+    statement = select(Profile).where(Profile.user_id == user_id)
+    return session.exec(statement).first()
+
+
+def create_profile(
+    *, session: Session, profile_create: ProfileCreate, user_id: int
+) -> Profile:
+    db_profile = Profile.model_validate(profile_create, update={"user_id": user_id})
+    session.add(db_profile)
+    session.commit()
+    session.refresh(db_profile)
+    return db_profile
