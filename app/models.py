@@ -132,7 +132,6 @@ class ProfileOut(ProfileBase):
     user_id: int
 
 
-# do the same for rooms {id, user, description, difficulty, is_active, recommended_video, room_type, title, visibility, created_at, updated_at, deleted_at}
 class RoomBase(SQLModel):
     title: str
     description: str | None = None
@@ -144,6 +143,7 @@ class RoomBase(SQLModel):
     created_at: str
     updated_at: str
     deleted_at: str | None = None
+    file_name: str = None
 
 
 class RoomCreate(RoomBase):
@@ -157,6 +157,7 @@ class RoomCreate(RoomBase):
     created_at: str
     updated_at: str
     deleted_at: str | None = None
+    file_name: str = None
 
 
 class RoomUpdate(RoomBase):
@@ -170,6 +171,7 @@ class RoomUpdate(RoomBase):
     created_at: str | None = None
     updated_at: str | None = None
     deleted_at: str | None = None
+    file_name: str = None
 
 
 class Room(RoomBase, table=True):
