@@ -1,4 +1,6 @@
+import pysnooper
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 
@@ -29,3 +31,28 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+
+# XXX: for debugging check that the openapi schema is generated
+@pysnooper.snoop(max_variable_length=None)
+def debugging_openapi():
+    # reference: https://fastapi.tiangolo.com/how-to/extending-openapi/#overriding-the-defaults
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        openapi_version=app.openapi_version,
+        description=app.description,
+        terms_of_service=app.terms_of_service,
+        contact=app.contact,
+        license_info=app.license_info,
+        routes=app.routes,
+        tags=app.openapi_tags,
+        servers=app.servers,
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
+app.openapi = debugging_openapi
