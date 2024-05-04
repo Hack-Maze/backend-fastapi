@@ -1,10 +1,10 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
-from sqlmodel import select, func
+from fastapi import APIRouter, File, HTTPException, UploadFile
+from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Message, Room, RoomCreate, RoomOut, RoomUpdate, RoomsOut
+from app.models import Message, Room, RoomCreate, RoomOut, RoomsOut, RoomUpdate
 
 router = APIRouter()
 
@@ -58,6 +58,29 @@ def create_room(
     Create new room.
     """
     room = Room.model_validate(room_in, update={"owner_id": current_user.id})
+    session.add(room)
+    session.commit()
+    session.refresh(room)
+    return room
+
+
+@router.post("/{id}/upload/")
+def upload_room_file(
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: int,
+    file_name: UploadFile = File(...),
+):
+    # reference: https://fastapi.tiangolo.com/reference/uploadfile/
+    room = session.get(Room, id)
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+    if not current_user.is_superuser and (room.owner_id != current_user.id):
+        raise HTTPException(status_code=400, detail="Not enough permissions")
+    # create file on disk first and then save the file name in the database
+    with open(f"files/{file_name.filename}", "wb") as file_object:
+        file_object.write(file_name.file.read())
+    room.file_name = file_name.filename
     session.add(room)
     session.commit()
     session.refresh(room)
