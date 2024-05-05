@@ -306,22 +306,32 @@ class QuestionsOut(SQLModel):
 ######################  Moduels ##################
 class ModuleBase(SQLModel):
     id : int
-    content: str = None
-    answer: str
-    hint: str
+    level : int
+    description: str
+    author: str
+    created_at : str
+    visibility : bool
+    collection: str
+
     
 class ModuleCreate(ModuleBase):
     id : int
-    content: str = None
-    answer: str
-    hint: str
+    level : int
+    created_at : str
+    description: str = None
+    author: str
+    visibility : bool
+    collection: str
 
 
 class ModuleUpdate(ModuleBase):
-    id : int  | None = None
-    content: str | None = None
-    answer: str |None = None
-    hint: str |None = None
+    id : int | None = None
+    level : int | None = None
+    author: str | None = None
+    created_at : str | None = None
+    description: str | None = None
+    visibility : bool | None = None
+    collection: str | None = None
 
 
 class Module(ModuleBase, table=True):
