@@ -28,4 +28,4 @@ def signup(session: SessionDep, user_in: UserCreateOpen) -> Any:
         )
     user_create = UserCreate.model_validate(user_in)
     user = crud.create_user(session=session, user_create=user_create)
-    return user_create
+    return user
