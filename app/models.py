@@ -49,6 +49,11 @@ class User(UserBase, table=True):
     profile: list["Profile"] = Relationship(back_populates="user")
     rooms: list["Room"] = Relationship(back_populates="owner")
     items: list["Item"] = Relationship(back_populates="owner")
+    section: list["Section"] = Relationship(back_populates="owner")
+    collection: list["Collection"] = Relationship(back_populates="owner")
+    question: list["Question"] = Relationship(back_populates="owner")
+    modules: list["Module"] = Relationship(back_populates="owner")
+    badges: list["Badges"] = Relationship(back_populates="owner")
 
 
 # Properties to return via API, id is always required
@@ -131,7 +136,7 @@ class ProfileOut(ProfileBase):
     id: UUID
     user_id: int
 
-
+################################ Room ##########################
 class RoomBase(SQLModel):
     title: str
     description: str | None = None
@@ -189,6 +194,188 @@ class RoomOut(RoomBase):
 class RoomsOut(SQLModel):
     data: list[RoomOut]
     count: int
+
+###################### section ##################
+class SectionBase(SQLModel):
+    id : int
+    title: str = None
+    Content: str
+    questions: str
+    
+class SectionCreate(SectionBase):
+    id : int
+    title: str = None
+    Content: str
+    questions: str
+
+
+class SectionUpdate(SectionBase):
+    id : int  | None = None
+    title: str | None = None
+    Content: str |None = None
+    questions: str |None = None
+
+
+class Section(SectionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="section")
+
+
+class SectionOut(SectionBase):
+    id: int
+    owner_id: int | None = None
+
+
+class SectionsOut(SQLModel):
+    data: list[SectionOut]
+    count: int
+###################### collection ##################
+class CollectionBase(SQLModel):
+    id : int
+    title: str = None
+    description: str
+    rooms: str
+    
+class CollectionCreate(CollectionBase):
+    id : int
+    title: str = None
+    description: str
+    rooms: str
+
+
+class CollectionUpdate(CollectionBase):
+    id : int  | None = None
+    title: str | None = None
+    description: str |None = None
+    rooms: str |None = None
+
+
+class Collection(CollectionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="collection")
+
+
+class CollectionOut(CollectionBase):
+    id: int
+    owner_id: int | None = None
+
+
+class CollectionsOut(SQLModel):
+    data: list[CollectionOut]
+    count: int
+######################  Question ##################
+class QuestionBase(SQLModel):
+    id : int
+    content: str = None
+    answer: str
+    hint: str
+    
+class QuestionCreate(QuestionBase):
+    id : int
+    content: str = None
+    answer: str
+    hint: str
+
+
+class QuestionUpdate(QuestionBase):
+    id : int  | None = None
+    content: str | None = None
+    answer: str |None = None
+    hint: str |None = None
+
+
+class Question(QuestionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="question")
+
+
+class QuestionOut(QuestionBase):
+    id: int
+    owner_id: int | None = None
+
+
+class QuestionsOut(SQLModel):
+    data: list[QuestionOut]
+    count: int
+######################  Moduels ##################
+class ModuleBase(SQLModel):
+    id : int
+    content: str = None
+    answer: str
+    hint: str
+    
+class ModuleCreate(ModuleBase):
+    id : int
+    content: str = None
+    answer: str
+    hint: str
+
+
+class ModuleUpdate(ModuleBase):
+    id : int  | None = None
+    content: str | None = None
+    answer: str |None = None
+    hint: str |None = None
+
+
+class Module(ModuleBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="modules")
+
+
+class ModuleOut(ModuleBase):
+    id: int
+    owner_id: int | None = None
+
+
+class ModuelsOut(SQLModel):
+    data: list[ModuleOut]
+    count: int
+######################  Badges ##################
+class BadgesBase(SQLModel):
+    id : int
+    title: str = None
+    image: str
+    
+    
+class BadgesCreate(BadgesBase):
+    id : int
+    title: str = None
+    image: str
+    
+
+
+class BadgesUpdate(BadgesBase):
+    id : int  | None = None
+    title: str | None = None
+    image: str |None = None
+    
+
+
+class Badges(BadgesBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="badges")
+
+
+class BadgesOut(BadgesBase):
+    id: int
+    owner_id: int | None = None
+
+
+class BadgessOut(SQLModel):
+    data: list[BadgesOut]
+    count: int
+
 
 
 # Generic message
