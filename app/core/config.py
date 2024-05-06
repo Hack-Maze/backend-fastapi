@@ -98,6 +98,11 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
 
+    # Azure Blob Storage
+    AZURE_ACCOUNT_NAME: str = "<account-name>"
+    AZURE_ACCOUNT_KEY: str = "<account-access-key>"
+    AZURE_CONTAINER_NAME: str = "<container-name>"
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (
