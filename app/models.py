@@ -47,13 +47,11 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
     profile: list["Profile"] = Relationship(back_populates="user")
-    rooms: list["Room"] = Relationship(back_populates="owner")
+    Mazess: list["Mazes"] = Relationship(back_populates="user")
     items: list["Item"] = Relationship(back_populates="owner")
-    section: list["Section"] = Relationship(back_populates="owner")
-    collection: list["Collection"] = Relationship(back_populates="owner")
-    question: list["Question"] = Relationship(back_populates="owner")
-    modules: list["Module"] = Relationship(back_populates="owner")
-    badges: list["Badges"] = Relationship(back_populates="owner")
+    Pages: list["Pages"] = Relationship(back_populates="Mazes")
+    question: list["Question"] = Relationship(back_populates="Pages")
+    badges: list["Badges"] = Relationship(back_populates="user")
 
 
 # Properties to return via API, id is always required
@@ -76,11 +74,11 @@ class ProfileBase(SQLModel):
     linkedin_link: str
     personal_blog_link: str
     job: str
-    active_room: bool
-    completed_rooms: str
+    active_Mazes: bool
+    completed_Mazess: str
     friends: str
     badges: str
-    created_rooms: str
+    created_Mazess: str
 
 
 class ProfileCreate(ProfileBase):
@@ -93,11 +91,11 @@ class ProfileCreate(ProfileBase):
     linkedin_link: str
     personal_blog_link: str
     job: str
-    active_room: bool
-    completed_rooms: str
+    active_Mazes: bool
+    completed_Mazess: str
     friends: str
     badges: str
-    created_rooms: str
+    created_Mazess: str
 
 
 class ProfileUpdate(ProfileBase):
@@ -109,10 +107,10 @@ class ProfileUpdate(ProfileBase):
     linkedin_link: str | None = None
     personal_blog_link: str | None = None
     job: str | None = None
-    active_room: bool | None = None
-    completed_rooms: str | None = None
+    active_Mazes: bool | None = None
+    completed_Mazess: str | None = None
     friends: str | None = None
-    created_rooms: str | None = None
+    created_Mazess: str | None = None
 
 
 class Profile(ProfileBase, table=True):
@@ -136,14 +134,14 @@ class ProfileOut(ProfileBase):
     id: UUID
     user_id: int
 
-################################ Room ##########################
-class RoomBase(SQLModel):
+################################ Mazes ##########################
+class MazesBase(SQLModel):
     title: str
     description: str | None = None
     difficulty: int
     is_active: bool
     recommended_video: str | None = None
-    room_type: str
+    Mazes_type: str
     visibility: str
     created_at: str
     updated_at: str
@@ -151,13 +149,13 @@ class RoomBase(SQLModel):
     file_name: str = None
 
 
-class RoomCreate(RoomBase):
+class MazesCreate(MazesBase):
     title: str
     description: str | None = None
     difficulty: int
     is_active: bool
     recommended_video: str | None = None
-    room_type: str
+    Mazes_type: str
     visibility: str
     created_at: str
     updated_at: str
@@ -165,13 +163,13 @@ class RoomCreate(RoomBase):
     file_name: str = None
 
 
-class RoomUpdate(RoomBase):
+class MazesUpdate(MazesBase):
     title: str | None = None
     description: str | None = None
     difficulty: int | None = None
     is_active: bool | None = None
     recommended_video: str | None = None
-    room_type: str | None = None
+    Mazes_type: str | None = None
     visibility: str | None = None
     created_at: str | None = None
     updated_at: str | None = None
@@ -179,105 +177,71 @@ class RoomUpdate(RoomBase):
     file_name: str = None
 
 
-class Room(RoomBase, table=True):
+class Mazes(MazesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="rooms")
+    owner: User | None = Relationship(back_populates="Mazess")
 
 
-class RoomOut(RoomBase):
+class MazesOut(MazesBase):
     id: int
     owner_id: int | None = None
 
 
-class RoomsOut(SQLModel):
-    data: list[RoomOut]
+class MazessOut(SQLModel):
+    data: list[MazesOut]
     count: int
 
-###################### section ##################
-class SectionBase(SQLModel):
+###################### Pages ##################
+class PagesBase(SQLModel):
     id : int
     title: str = None
     Content: str
     questions: str
     
-class SectionCreate(SectionBase):
+class PagesCreate(PagesBase):
     id : int
     title: str = None
     Content: str
     questions: str
 
 
-class SectionUpdate(SectionBase):
+class PagesUpdate(PagesBase):
     id : int  | None = None
     title: str | None = None
     Content: str |None = None
     questions: str |None = None
 
 
-class Section(SectionBase, table=True):
+class Pages(PagesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="section")
+    owner: User | None = Relationship(back_populates="Pages")
 
 
-class SectionOut(SectionBase):
+class PagesOut(PagesBase):
     id: int
     owner_id: int | None = None
 
 
-class SectionsOut(SQLModel):
-    data: list[SectionOut]
-    count: int
-###################### collection ##################
-class CollectionBase(SQLModel):
-    id : int
-    title: str = None
-    description: str
-    rooms: str
-    
-class CollectionCreate(CollectionBase):
-    id : int
-    title: str = None
-    description: str
-    rooms: str
-
-
-class CollectionUpdate(CollectionBase):
-    id : int  | None = None
-    title: str | None = None
-    description: str |None = None
-    rooms: str |None = None
-
-
-class Collection(CollectionBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="collection")
-
-
-class CollectionOut(CollectionBase):
-    id: int
-    owner_id: int | None = None
-
-
-class CollectionsOut(SQLModel):
-    data: list[CollectionOut]
+class PagessOut(SQLModel):
+    data: list[PagesOut]
     count: int
 ######################  Question ##################
 class QuestionBase(SQLModel):
     id : int
     content: str = None
     answer: str
+    answer_type: str
     hint: str
     
 class QuestionCreate(QuestionBase):
     id : int
     content: str = None
     answer: str
+    answer_type: str
     hint: str
 
 
@@ -285,6 +249,7 @@ class QuestionUpdate(QuestionBase):
     id : int  | None = None
     content: str | None = None
     answer: str |None = None
+    answer_type: str   |None = None
     hint: str |None = None
 
 
@@ -302,52 +267,6 @@ class QuestionOut(QuestionBase):
 
 class QuestionsOut(SQLModel):
     data: list[QuestionOut]
-    count: int
-######################  Moduels ##################
-class ModuleBase(SQLModel):
-    id : int
-    level : int
-    description: str
-    author: str
-    created_at : str
-    visibility : bool
-    collection: str
-
-    
-class ModuleCreate(ModuleBase):
-    id : int
-    level : int
-    created_at : str
-    description: str = None
-    author: str
-    visibility : bool
-    collection: str
-
-
-class ModuleUpdate(ModuleBase):
-    id : int | None = None
-    level : int | None = None
-    author: str | None = None
-    created_at : str | None = None
-    description: str | None = None
-    visibility : bool | None = None
-    collection: str | None = None
-
-
-class Module(ModuleBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="modules")
-
-
-class ModuleOut(ModuleBase):
-    id: int
-    owner_id: int | None = None
-
-
-class ModuelsOut(SQLModel):
-    data: list[ModuleOut]
     count: int
 ######################  Badges ##################
 class BadgesBase(SQLModel):
