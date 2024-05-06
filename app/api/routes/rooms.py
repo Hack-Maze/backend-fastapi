@@ -5,6 +5,15 @@ from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.models import Message, Room, RoomCreate, RoomOut, RoomsOut, RoomUpdate
+from azure.storage.blob import BlobServiceClient
+from datetime import datetime, timedelta
+from azure.storage.blob import (
+    BlobServiceClient,
+    generate_account_sas,
+    ResourceTypes,
+    AccountSasPermissions,
+)
+
 
 router = APIRouter()
 
@@ -71,15 +80,33 @@ def upload_room_file(
     id: int,
     file_name: UploadFile = File(...),
 ):
-    # reference: https://fastapi.tiangolo.com/reference/uploadfile/
     room = session.get(Room, id)
     if not room:
         raise HTTPException(status_code=404, detail="Room not found")
     if not current_user.is_superuser and (room.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    # create file on disk first and then save the file name in the database
-    with open(f"files/{file_name.filename}", "wb") as file_object:
-        file_object.write(file_name.file.read())
+    from app.core.config import settings
+
+    # TODO: cache the sas token
+    sas_token = generate_account_sas(
+        account_name=settings.AZURE_ACCOUNT_NAME,
+        account_key=settings.AZURE_ACCOUNT_KEY,
+        resource_types=ResourceTypes(service=True),
+        permission=AccountSasPermissions(read=True),
+        expiry=datetime.now() + timedelta(days=7),
+    )
+
+    blob_service_client = BlobServiceClient(
+        account_url=f"https://{settings.AZURE_ACCOUNT_NAME}.blob.core.windows.net",
+        credential=sas_token,
+    )
+
+    blob = blob_service_client.get_blob_client(
+        container=settings.AZURE_CONTAINER_NAME,
+        blob=file_name.filename,
+    )
+    blob.upload_blob(file_name.file)
+
     room.file_name = file_name.filename
     session.add(room)
     session.commit()
