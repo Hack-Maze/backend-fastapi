@@ -1,7 +1,7 @@
 from uuid import UUID, uuid4
 
 from sqlmodel import Field, Relationship, SQLModel
-
+from datetime import datetime
 
 # Shared properties
 # TODO replace email str with EmailStr when sqlmodel supports it
@@ -10,11 +10,13 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = None
+    # last_solved_at : datetime | None = None
 
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
     password: str
+    
 
 
 # TODO replace email str with EmailStr when sqlmodel supports it
@@ -22,6 +24,7 @@ class UserCreateOpen(SQLModel):
     email: str
     password: str
     full_name: str | None = None
+    # last_solved_at : datetime
 
 
 # Properties to receive via API on update, all are optional
@@ -29,12 +32,16 @@ class UserCreateOpen(SQLModel):
 class UserUpdate(UserBase):
     email: str | None = None  # type: ignore
     password: str | None = None
+    # last_solved_at : datetime | None = None
+
 
 
 # TODO replace email str with EmailStr when sqlmodel supports it
 class UserUpdateMe(SQLModel):
     full_name: str | None = None
     email: str | None = None
+    # last_solved_at : datetime | None = None
+
 
 
 class UpdatePassword(SQLModel):
@@ -47,11 +54,12 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
     profile: list["Profile"] = Relationship(back_populates="user")
-    Mazess: list["Mazes"] = Relationship(back_populates="user")
+    Mazess: list["Mazes"] = Relationship(back_populates="owner")
     items: list["Item"] = Relationship(back_populates="owner")
-    Pages: list["Pages"] = Relationship(back_populates="Mazes")
-    question: list["Question"] = Relationship(back_populates="Pages")
-    badges: list["Badges"] = Relationship(back_populates="user")
+    Pages: list["Pages"] = Relationship(back_populates="owner")
+    question: list["Question"] = Relationship(back_populates="owner")
+    badges: list["Badges"] = Relationship(back_populates="owner")
+    tags: list["Tag"] = Relationship(back_populates="owner")
 
 
 # Properties to return via API, id is always required
@@ -70,6 +78,7 @@ class ProfileBase(SQLModel):
     rank: int
     level: int
     bio: str
+    image: str
     github_link: str
     linkedin_link: str
     personal_blog_link: str
@@ -79,6 +88,9 @@ class ProfileBase(SQLModel):
     friends: str
     badges: str
     created_Mazess: str
+    last_solved_at : datetime 
+
+    
 
 
 class ProfileCreate(ProfileBase):
@@ -86,6 +98,7 @@ class ProfileCreate(ProfileBase):
     country: str
     rank: int
     level: int
+    image: int
     bio: str
     github_link: str
     linkedin_link: str
@@ -96,6 +109,8 @@ class ProfileCreate(ProfileBase):
     friends: str
     badges: str
     created_Mazess: str
+    last_solved_at : datetime
+    
 
 
 class ProfileUpdate(ProfileBase):
@@ -103,6 +118,7 @@ class ProfileUpdate(ProfileBase):
     country: str | None = None
     rank: int | None = None
     level: int | None = None
+    image: int | None = None
     github_link: str | None = None
     linkedin_link: str | None = None
     personal_blog_link: str | None = None
@@ -111,6 +127,9 @@ class ProfileUpdate(ProfileBase):
     completed_Mazess: str | None = None
     friends: str | None = None
     created_Mazess: str | None = None
+    last_solved_at : datetime | None = None
+
+    
 
 
 class Profile(ProfileBase, table=True):
@@ -142,6 +161,8 @@ class MazesBase(SQLModel):
     is_active: bool
     recommended_video: str | None = None
     Mazes_type: str
+    summary: str
+    enrolled: bool
     visibility: str
     created_at: str
     updated_at: str
@@ -156,6 +177,8 @@ class MazesCreate(MazesBase):
     is_active: bool
     recommended_video: str | None = None
     Mazes_type: str
+    summary: str
+    enrolled: bool
     visibility: str
     created_at: str
     updated_at: str
@@ -173,6 +196,8 @@ class MazesUpdate(MazesBase):
     visibility: str | None = None
     created_at: str | None = None
     updated_at: str | None = None
+    summary: str | None = None
+    enrolled: bool | None = None
     deleted_at: str | None = None
     file_name: str = None
 
@@ -236,6 +261,7 @@ class QuestionBase(SQLModel):
     answer: str
     answer_type: str
     hint: str
+    solved_at :datetime
     
 class QuestionCreate(QuestionBase):
     id : int
@@ -243,6 +269,7 @@ class QuestionCreate(QuestionBase):
     answer: str
     answer_type: str
     hint: str
+    solved_at :datetime
 
 
 class QuestionUpdate(QuestionBase):
@@ -251,6 +278,7 @@ class QuestionUpdate(QuestionBase):
     answer: str |None = None
     answer_type: str   |None = None
     hint: str |None = None
+    solved_at :datetime |None = None
 
 
 class Question(QuestionBase, table=True):
@@ -303,6 +331,41 @@ class BadgesOut(BadgesBase):
 
 class BadgessOut(SQLModel):
     data: list[BadgesOut]
+    count: int
+######################  tag  ##################
+class TagBase(SQLModel):
+    id : int
+    title: str = None
+    
+    
+    
+class TagCreate(TagBase):
+    id : int
+    title: str = None
+   
+    
+
+
+class TagUpdate(TagBase):
+    id : int  | None = None
+    title: str | None = None
+   
+
+
+class Tag(TagBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="tags")
+
+
+class TagOut(TagBase):
+    id: int
+    owner_id: int | None = None
+
+
+class TagsOut(SQLModel):
+    data: list[TagOut]
     count: int
 
 
