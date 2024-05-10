@@ -67,6 +67,7 @@ class ProfileBase(SQLModel):
     rank: int
     level: int
     bio: str
+    image: str
     github_link: str
     linkedin_link: str
     personal_blog_link: str
@@ -84,6 +85,7 @@ class ProfileCreate(ProfileBase):
     rank: int
     level: int
     bio: str
+    image: str
     github_link: str
     linkedin_link: str
     personal_blog_link: str
@@ -104,6 +106,7 @@ class ProfileUpdate(ProfileBase):
     linkedin_link: str | None = None
     personal_blog_link: str | None = None
     job: str | None = None
+    image: str | None = None
     active_room: bool | None = None
     completed_rooms: str | None = None
     friends: str | None = None
@@ -210,6 +213,7 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str
+
 
 # Shared properties
 class ItemBase(SQLModel):
