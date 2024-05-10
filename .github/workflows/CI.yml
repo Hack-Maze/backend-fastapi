@@ -418,7 +418,7 @@ jobs:
 
 
   push_to_Docker_Hub:
-    
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     defaults:
       run:
