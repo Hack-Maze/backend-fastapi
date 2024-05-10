@@ -69,7 +69,7 @@ def create_question(
 
 @router.put("/{id}", response_model=QuestionOut)
 def update_question(
-    *, session: SessionDep, current_user: CurrentUser, id: int, room_in: QuestionUpdate
+    *, session: SessionDep, current_user: CurrentUser, id: int, question_in: QuestionUpdate
 ) -> Any:
     """
     Update a question.

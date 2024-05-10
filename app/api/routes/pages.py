@@ -10,11 +10,11 @@ router = APIRouter()
 
 
 @router.get("/", response_model=PagessOut)
-def read_pagess(
+def read_pages(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve pagess.
+    Retrieve pages.
     """
     if current_user.is_superuser:
         count_statement = select(func.count()).select_from(Pages)
@@ -38,24 +38,24 @@ def read_pagess(
 
 
 @router.get("/{id}", response_model=PagesOut)
-def read_pagess(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
+def read_page(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     """
-    Get Pages by ID.
+    Get Page by ID.
     """
     pages = session.get(Pages, id)
     if not pages:
-        raise HTTPException(status_code=404, detail="Pages not found")
+        raise HTTPException(status_code=404, detail="Page not found")
     if not current_user.is_superuser and (pages.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return pages
 
 
 @router.post("/", response_model=PagesOut)
-def create_pages(
+def create_page(
     *, session: SessionDep, current_user: CurrentUser, pages_in: PagesCreate
 ) -> Any:
     """
-    Create new Pages.
+    Create a new Page.
     """
     pages = Pages.model_validate(pages_in, update={"owner_id": current_user.id})
     session.add(pages)
@@ -64,15 +64,15 @@ def create_pages(
     return pages
 
 @router.put("/{id}", response_model=PagesOut)
-def update_room(
+def update_page(
     *, session: SessionDep, current_user: CurrentUser, id: int, pages_in: PagesUpdate
 ) -> Any:
     """
-    Update a pages.
+    Update a page.
     """
     pages = session.get(Pages, id)
     if not pages:
-        raise HTTPException(status_code=404, detail="Pages not found")
+        raise HTTPException(status_code=404, detail="Page not found")
     if not current_user.is_superuser and (pages.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = pages_in.model_dump(exclude_unset=True)
@@ -84,16 +84,16 @@ def update_room(
 
 
 @router.delete("/{id}", response_model=Message)
-def delete_pages(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
+def delete_page(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
     """
-    Delete a pages.
+    Delete a page.
     """
   # Correct indentation
     pages = session.get(Pages, id)
     if not pages:
-        raise HTTPException(status_code=404, detail="Pages not found")
+        raise HTTPException(status_code=404, detail="Page not found")
     if pages.user_id != current_user.id:
         raise HTTPException(status_code=400, detail="Not enough permissions")
     session.delete(pages)
     session.commit()
-    return Message(message="Pages deleted successfully")
+    return Message(message="Page deleted successfully")

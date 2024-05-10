@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=BadgessOut)
-def read_Badges(
+def read_all_badges(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
@@ -38,65 +38,65 @@ def read_Badges(
 
 
 @router.get("/{id}", response_model=BadgesOut)
-def read_badges(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
+def read_user_badges(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     """
     Get badges by ID.
     """
     badges = session.get(Badges, id)
     if not badges:
-        raise HTTPException(status_code=404, detail="Badges not found")
+        raise HTTPException(status_code=404, detail="Badge not found")
     if not current_user.is_superuser and (badges.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return badges
 
 
 @router.post("/", response_model=BadgesOut)
-def create_badges(
+def create_badge(
     *, session: SessionDep, current_user: CurrentUser, badges_in: BadgesCreate
 ) -> Any:
     """
-    Create new badges.
+    Create a new badge.
     """
-    badges = Badges.model_validate(badges_in, update={"owner_id": current_user.id})
-    session.add(badges)
+    badge = Badges.model_validate(badges_in, update={"owner_id": current_user.id})
+    session.add(badge)
     session.commit()
-    session.refresh(badges)
-    return badges
+    session.refresh(badge)
+    return badge
 
 
 
 
 
 @router.put("/{id}", response_model=BadgesOut)
-def update_badges(
+def update_badge(
     *, session: SessionDep, current_user: CurrentUser, id: int, badges_in: BadgesUpdate
 ) -> Any:
     """
-    Update a badges.
+    Update a badge.
     """
-    badges = session.get(Badges, id)
-    if not badges:
-        raise HTTPException(status_code=404, detail="Badges not found")
-    if not current_user.is_superuser and (badges.owner_id != current_user.id):
+    badge = session.get(Badges, id)
+    if not badge:
+        raise HTTPException(status_code=404, detail="Badge not found")
+    if not current_user.is_superuser and (badge.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = badges_in.model_dump(exclude_unset=True)
-    badges.sqlmodel_update(update_dict)
-    session.add(badges)
+    badge.sqlmodel_update(update_dict)
+    session.add(badge)
     session.commit()
-    session.refresh(badges)
-    return badges
+    session.refresh(badge)
+    return badge
 
 
 @router.delete("/{id}", response_model=Message)
-def delete_badges(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
+def delete_badge(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
     """
-    Delete a badges.
+    Delete a badge.
     """
-    badges = session.get(Badges, id)
-    if not badges:
-        raise HTTPException(status_code=404, detail="Badges not found")
-    if badges.user_id != current_user.id:
+    badge = session.get(Badges, id)
+    if not badge:
+        raise HTTPException(status_code=404, detail="Badge not found")
+    if badge.user_id != current_user.id:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    session.delete(badges)
+    session.delete(badge)
     session.commit()
-    return Message(message="Badges deleted successfully")
+    return Message(message="Badge deleted successfully")

@@ -1,3 +1,4 @@
+
 from uuid import UUID, uuid4
 
 from sqlmodel import Field, Relationship, SQLModel
@@ -10,7 +11,7 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = None
-    # last_solved_at : datetime | None = None
+
 
 
 # Properties to receive via API on creation
@@ -54,9 +55,9 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
     profile: list["Profile"] = Relationship(back_populates="user")
-    Mazess: list["Mazes"] = Relationship(back_populates="owner")
+    mazes: list["Maze"] = Relationship(back_populates="owner")
     items: list["Item"] = Relationship(back_populates="owner")
-    Pages: list["Pages"] = Relationship(back_populates="owner")
+    pages: list["Pages"] = Relationship(back_populates="owner")
     question: list["Question"] = Relationship(back_populates="owner")
     badges: list["Badges"] = Relationship(back_populates="owner")
     tags: list["Tag"] = Relationship(back_populates="owner")
@@ -83,11 +84,11 @@ class ProfileBase(SQLModel):
     linkedin_link: str
     personal_blog_link: str
     job: str
-    active_Mazes: bool
-    completed_Mazess: str
+    active_maze: bool
+    completed_maze: str
     friends: str
     badges: str
-    created_Mazess: str
+    created_maze: str
     last_solved_at : datetime 
 
     
@@ -104,11 +105,11 @@ class ProfileCreate(ProfileBase):
     linkedin_link: str
     personal_blog_link: str
     job: str
-    active_Mazes: bool
-    completed_Mazess: str
+    active_maze: bool
+    completed_maze: str
     friends: str
     badges: str
-    created_Mazess: str
+    created_maze: str
     last_solved_at : datetime
     
 
@@ -123,10 +124,10 @@ class ProfileUpdate(ProfileBase):
     linkedin_link: str | None = None
     personal_blog_link: str | None = None
     job: str | None = None
-    active_Mazes: bool | None = None
-    completed_Mazess: str | None = None
+    active_maze: bool | None = None
+    completed_maze: str | None = None
     friends: str | None = None
-    created_Mazess: str | None = None
+    created_maze: str | None = None
     last_solved_at : datetime | None = None
 
     
@@ -153,14 +154,14 @@ class ProfileOut(ProfileBase):
     id: UUID
     user_id: int
 
-################################ Mazes ##########################
+################################ Maze ##########################
 class MazesBase(SQLModel):
     title: str
     description: str | None = None
     difficulty: int
     is_active: bool
     recommended_video: str | None = None
-    Mazes_type: str
+    mazes_type: str
     summary: str
     enrolled: bool
     visibility: str
@@ -176,7 +177,7 @@ class MazesCreate(MazesBase):
     difficulty: int
     is_active: bool
     recommended_video: str | None = None
-    Mazes_type: str
+    mazes_type: str
     summary: str
     enrolled: bool
     visibility: str
@@ -192,7 +193,7 @@ class MazesUpdate(MazesBase):
     difficulty: int | None = None
     is_active: bool | None = None
     recommended_video: str | None = None
-    Mazes_type: str | None = None
+    mazes_type: str | None = None
     visibility: str | None = None
     created_at: str | None = None
     updated_at: str | None = None
@@ -202,20 +203,19 @@ class MazesUpdate(MazesBase):
     file_name: str = None
 
 
-class Mazes(MazesBase, table=True):
+class Maze(MazesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="Mazess")
+    owner: User | None = Relationship(back_populates="mazes")
 
-
-class MazesOut(MazesBase):
+class MazeOut(MazesBase):
     id: int
     owner_id: int | None = None
 
 
-class MazessOut(SQLModel):
-    data: list[MazesOut]
+class MazesOut(SQLModel):
+    data: list[MazeOut]
     count: int
 
 ###################### Pages ##################
@@ -243,7 +243,7 @@ class Pages(PagesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="Pages")
+    owner: User | None = Relationship(back_populates="pages")
 
 
 class PagesOut(PagesBase):
@@ -261,7 +261,7 @@ class QuestionBase(SQLModel):
     answer: str
     answer_type: str
     hint: str
-    solved_at :datetime
+    solved_at : datetime
     
 class QuestionCreate(QuestionBase):
     id : int
@@ -275,10 +275,10 @@ class QuestionCreate(QuestionBase):
 class QuestionUpdate(QuestionBase):
     id : int  | None = None
     content: str | None = None
-    answer: str |None = None
-    answer_type: str   |None = None
-    hint: str |None = None
-    solved_at :datetime |None = None
+    answer: str | None = None
+    answer_type: str   | None = None
+    hint: str | None = None
+    solved_at: datetime | None = None
 
 
 class Question(QuestionBase, table=True):
@@ -303,6 +303,7 @@ class BadgesBase(SQLModel):
     image: str
     
     
+    
 class BadgesCreate(BadgesBase):
     id : int
     title: str = None
@@ -313,7 +314,7 @@ class BadgesCreate(BadgesBase):
 class BadgesUpdate(BadgesBase):
     id : int  | None = None
     title: str | None = None
-    image: str |None = None
+    image: str | None = None
     
 
 

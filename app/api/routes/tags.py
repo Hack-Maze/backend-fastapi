@@ -10,11 +10,11 @@ router = APIRouter()
 
 
 @router.get("/", response_model=TagsOut)
-def read_Tag(
+def read_tags(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve Tag.
+    Retrieve Tags.
     """
     if current_user.is_superuser:
         count_statement = select(func.count()).select_from(Tag)

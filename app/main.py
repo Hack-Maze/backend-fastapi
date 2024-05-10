@@ -32,9 +32,9 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
-app.mount(
-    "/.files", StaticFiles(directory="app/files"), "files"
-)  # reference: https://python.plainenglish.io/file-uploads-and-downloads-in-fastapi-a-comprehensive-guide-06e0b18bb245
+# app.mount(
+#     "/.files", StaticFiles(directory="app/files"), "files"
+# )  # reference: https://python.plainenglish.io/file-uploads-and-downloads-in-fastapi-a-comprehensive-guide-06e0b18bb245
 
 
 # XXX: for debugging check that the openapi schema is generated

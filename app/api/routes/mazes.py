@@ -4,119 +4,119 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Message, Mazes, MazesCreate, MazesOut, MazessOut, MazesUpdate
+from app.models import Message, Maze, MazesCreate, MazesOut, MazeOut ,  MazesUpdate
 
 router = APIRouter()
 
 
-@router.get("/", response_model=MazessOut)
-def read_Mazess(
+@router.get("/", response_model=MazesOut)
+def read_mazes(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
-    Retrieve Mazess.
+    Retrieve Mazes.
     """
     if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Mazes)
+        count_statement = select(func.count()).select_from(Maze)
         count = session.exec(count_statement).one()
-        statement = select(Mazes).offset(skip).limit(limit)
+        statement = select(Maze).offset(skip).limit(limit)
     else:
         count_statement = (
             select(func.count())
-            .select_from(Mazes)
-            .where(Mazes.owner_id == current_user.id)
+            .select_from(Maze)
+            .where(Maze.owner_id == current_user.id)
         )
         count = session.exec(count_statement).one()
         statement = (
-            select(Mazes)
-            .where(Mazes.owner_id == current_user.id)
+            select(Maze)
+            .where(Maze.owner_id == current_user.id)
             .offset(skip)
             .limit(limit)
         )
-    Mazess = session.exec(statement).all()
-    return MazessOut(data=Mazess, count=count)
+    mazes = session.exec(statement).all()
+    return MazesOut(data=mazes, count=count)
 
 
-@router.get("/{id}", response_model=MazesOut)
-def read_Mazes(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
+@router.get("/{id}", response_model=MazeOut)
+def read_maze(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     """
-    Get mazes by ID.
+    Get maze by ID.
     """
-    mazes = session.get(Mazes, id)
-    if not mazes:
-        raise HTTPException(status_code=404, detail="Mazes not found")
-    if not current_user.is_superuser and (mazes.owner_id != current_user.id):
+    maze = session.get(Maze, id)
+    if not maze:
+        raise HTTPException(status_code=404, detail="Maze not found")
+    if not current_user.is_superuser and (maze.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    return mazes
+    return maze
 
 
-@router.post("/", response_model=MazesOut)
-def create_Mazes(
+@router.post("/", response_model=MazeOut)
+def create_maze(
     *, session: SessionDep, current_user: CurrentUser, Mazes_in: MazesCreate
 ) -> Any:
     """
-    Create new mazes.
+    Create new maze.
     """
-    mazes = Mazes.model_validate(Mazes_in, update={"owner_id": current_user.id})
-    session.add(mazes)
+    maze = Maze.model_validate(Mazes_in, update={"owner_id": current_user.id})
+    session.add(maze)
     session.commit()
-    session.refresh(mazes)
-    return mazes
+    session.refresh(maze)
+    return maze
 
 
-@router.post("/{id}/upload/")
-def upload_Mazes_file(
-    session: SessionDep,
-    current_user: CurrentUser,
-    id: int,
-    file_name: UploadFile = File(...),
-):
-    # reference: https://fastapi.tiangolo.com/reference/uploadfile/
-    mazes = session.get(Mazes, id)
-    if not mazes:
-        raise HTTPException(status_code=404, detail="Mazes not found")
-    if not current_user.is_superuser and (mazes.owner_id != current_user.id):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    # create file on disk first and then save the file name in the database
-    with open(f"files/{file_name.filename}", "wb") as file_object:
-        file_object.write(file_name.file.read())
-    mazes.file_name = file_name.filename
-    session.add(mazes)
-    session.commit()
-    session.refresh(mazes)
-    return mazes
+# @router.post("/{id}/upload/")
+# def upload_maze_file(
+#     session: SessionDep,
+#     current_user: CurrentUser,
+#     id: int,
+#     file_name: UploadFile = File(...),
+# ):
+#     # reference: https://fastapi.tiangolo.com/reference/uploadfile/
+#     maze = session.get(Maze, id)
+#     if not maze:
+#         raise HTTPException(status_code=404, detail="Maze not found")
+#     if not current_user.is_superuser and (maze.owner_id != current_user.id):
+#         raise HTTPException(status_code=400, detail="Not enough permissions")
+#     # create file on disk first and then save the file name in the database
+#     with open(f"files/{file_name.filename}", "wb") as file_object:
+#         file_object.write(file_name.file.read())
+#     maze.file_name = file_name.filename
+#     session.add(maze)
+#     session.commit()
+#     session.refresh(maze)
+#     return maze
 
 
-@router.put("/{id}", response_model=MazesOut)
-def update_Mazes(
+@router.put("/{id}", response_model=MazeOut)
+def update_maze(
     *, session: SessionDep, current_user: CurrentUser, id: int, Mazes_in: MazesUpdate
 ) -> Any:
     """
-    Update a mazes.
+    Update a maze.
     """
-    mazes = session.get(Mazes, id)
-    if not mazes:
-        raise HTTPException(status_code=404, detail="Mazes not found")
-    if not current_user.is_superuser and (mazes.owner_id != current_user.id):
+    maze = session.get(Maze, id)
+    if not maze:
+        raise HTTPException(status_code=404, detail="Maze not found")
+    if not current_user.is_superuser and (maze.owner_id != current_user.id):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     update_dict = Mazes_in.model_dump(exclude_unset=True)
-    mazes.sqlmodel_update(update_dict)
-    session.add(mazes)
+    maze.sqlmodel_update(update_dict)
+    session.add(maze)
     session.commit()
-    session.refresh(mazes)
-    return mazes
+    session.refresh(maze)
+    return maze
 
 
 @router.delete("/{id}", response_model=Message)
-def delete_Mazes(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
+def delete_maze(session: SessionDep, current_user: CurrentUser, id: int) -> Message:
     """
-    Delete a mazes.
+    Delete a maze.
     """
-    mazes = session.get(Mazes, id)
-    if not mazes:
-        raise HTTPException(status_code=404, detail="Mazes not found")
-    if mazes.user_id != current_user.id:
+    maze = session.get(Maze, id)
+    if not maze:
+        raise HTTPException(status_code=404, detail="Maze not found")
+    if maze.user_id != current_user.id:
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    session.delete(mazes)
+    session.delete(maze)
     session.commit()
-    return Message(message="Mazes deleted successfully")
+    return Message(message="Maze deleted successfully")

@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[ProfileOut])
-def read_Profile(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_profiles(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     """
     List all Profiles.
     """
@@ -20,7 +20,7 @@ def read_Profile(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
 
 
 @router.get("/{profile_id}", response_model=ProfileOut)
-def read_Profile_by_id(session: SessionDep, profile_id: UUID) -> Any:
+def read_profile_by_id(session: SessionDep, profile_id: UUID) -> Any:
     """
     Get Profile by ID.
     """
