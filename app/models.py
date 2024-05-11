@@ -11,6 +11,8 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = None
+    # level: int
+
 
 
 
@@ -90,6 +92,7 @@ class ProfileBase(SQLModel):
     badges: str
     created_maze: str
     last_solved_at : datetime 
+    
 
     
 
@@ -169,6 +172,7 @@ class MazesBase(SQLModel):
     updated_at: str
     deleted_at: str | None = None
     file_name: str = None
+    image: str = None
 
 
 class MazesCreate(MazesBase):
@@ -185,6 +189,7 @@ class MazesCreate(MazesBase):
     updated_at: str
     deleted_at: str | None = None
     file_name: str = None
+    image: str = None
 
 
 class MazesUpdate(MazesBase):
@@ -201,11 +206,13 @@ class MazesUpdate(MazesBase):
     enrolled: bool | None = None
     deleted_at: str | None = None
     file_name: str = None
+    image: str = None
 
 
 class Maze(MazesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
+    # m-m relationship with User 
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
     owner: User | None = Relationship(back_populates="mazes")
 

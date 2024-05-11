@@ -51,6 +51,15 @@ def read_profile_by_id(session: SessionDep, profile_id: UUID) -> Any:
 #     )
 #     return profile
 
+@router.get("/{user_id}", response_model=ProfileOut)
+def read_Profile_by_id(session: SessionDep, user_id: int) -> Any:
+    """
+    Get Profile by ID by user_id.
+    """
+    profile = session.get(Profile, user_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
 
 # @router.delete("/{profile_id}", response_model=Message)
 # def delete_Profile(
