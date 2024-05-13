@@ -1,8 +1,10 @@
 
 from uuid import UUID, uuid4
+from typing import ClassVar, List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 from datetime import datetime
+# from pydantic import  BaseModel,  model_config
 
 # Shared properties
 # TODO replace email str with EmailStr when sqlmodel supports it
@@ -52,20 +54,35 @@ class UpdatePassword(SQLModel):
     new_password: str
 
 
-# Database model, database table inferred from class name
+#### ! link tables ####
+class UserBadgeLink(SQLModel, table=True):
+    user_id: int | None = Field(default=None, foreign_key="user.id", primary_key=True)
+    badge_id: int | None = Field(default=None, foreign_key="badge.id", primary_key=True)
+
+
+class MazeTagLink(SQLModel, table=True):
+    maze_id: int | None = Field(default=None, foreign_key="maze.id", primary_key=True)
+    tag_id: int | None = Field(default=None, foreign_key="tag.id", primary_key=True)
+
+# completed mazes many to many relationship with maze
+class UserMazeLink(SQLModel, table=True):
+    user_id: int | None = Field(default=None, foreign_key="user.id", primary_key=True)
+    maze_id: int | None = Field(default=None, foreign_key="maze.id", primary_key=True)
+
+
+#### !  User model ####
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
-    profile: list["Profile"] = Relationship(back_populates="user")
-    mazes: list["Maze"] = Relationship(back_populates="owner")
-    items: list["Item"] = Relationship(back_populates="owner")
-    pages: list["Pages"] = Relationship(back_populates="owner")
-    question: list["Question"] = Relationship(back_populates="owner")
-    badges: list["Badges"] = Relationship(back_populates="owner")
-    tags: list["Tag"] = Relationship(back_populates="owner")
+    profile: list["Profile"] = Relationship(back_populates="user") # Add back_populates to User
+    badges: list["Badge"] = Relationship(back_populates="users", link_model=UserBadgeLink) # Many to many relationship
+    completed_mazes: list["Maze"] = Relationship(back_populates="solvers", link_model=UserMazeLink)
+    enrolled_mazes: list["Maze"] = Relationship(back_populates="enrolled_users", link_model=UserMazeLink)
+    
 
 
 # Properties to return via API, id is always required
+
 class UserOut(UserBase):
     id: int
 
@@ -86,14 +103,11 @@ class ProfileBase(SQLModel):
     linkedin_link: str
     personal_blog_link: str
     job: str
-    active_maze: bool
-    completed_maze: str
-    friends: str
-    badges: str
-    created_maze: str
-    last_solved_at : datetime 
-    
-
+    # active_maze: bool                   # TODO  active_maze must be of type maze
+    # completed_mazes: str = None
+    # friends: str= None
+    # created_mazes: str = None #TODO relationship with maze
+    last_solved_at : datetime
     
 
 
@@ -102,18 +116,17 @@ class ProfileCreate(ProfileBase):
     country: str
     rank: int
     level: int
-    image: int
     bio: str
+    image: str
     github_link: str
     linkedin_link: str
     personal_blog_link: str
     job: str
-    active_maze: bool
-    completed_maze: str
-    friends: str
-    badges: str
-    created_maze: str
-    last_solved_at : datetime
+    # active_maze: bool
+    # completed_mazes: str = None
+    # friends: str = None
+    # created_mazes: str = None
+    last_solved_at : datetime 
     
 
 
@@ -127,14 +140,15 @@ class ProfileUpdate(ProfileBase):
     linkedin_link: str | None = None
     personal_blog_link: str | None = None
     job: str | None = None
-    active_maze: bool | None = None
-    completed_maze: str | None = None
-    friends: str | None = None
-    created_maze: str | None = None
+    # active_maze: bool | None = None
+    # completed_mazes: str | None = None
+    # friends: str| None = None
+    # created_mazes: str | None = None
     last_solved_at : datetime | None = None
 
-    
 
+
+####! Profile Model ####
 
 class Profile(ProfileBase, table=True):
     id: UUID | None = Field(
@@ -153,11 +167,12 @@ class Profile(ProfileBase, table=True):
     )
 
 
+
 class ProfileOut(ProfileBase):
     id: UUID
     user_id: int
 
-################################ Maze ##########################
+####! Maze Model ####
 class MazesBase(SQLModel):
     title: str
     description: str | None = None
@@ -212,9 +227,14 @@ class MazesUpdate(MazesBase):
 class Maze(MazesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
-    # m-m relationship with User 
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="mazes")
+    # user_id: int = Field(foreign_key="user.id", nullable=False) # Add foreign key
+    # owner: User = Relationship(back_populates="mazes") # Add back_populates
+    tags: list["Tag"] = Relationship(back_populates="mazes", link_model=MazeTagLink)
+    solvers: list["User"] = Relationship(back_populates="completed_mazes", link_model=UserMazeLink)
+    enrolled_users: list["User"] = Relationship(back_populates="enrolled_mazes", link_model=UserMazeLink)
+    user_id: int | None = Field(default=None, foreign_key="user.id")
+
+
 
 class MazeOut(MazesBase):
     id: int
@@ -225,7 +245,7 @@ class MazesOut(SQLModel):
     data: list[MazeOut]
     count: int
 
-###################### Pages ##################
+####! Pages Model ####
 class PagesBase(SQLModel):
     id : int
     title: str = None
@@ -249,8 +269,14 @@ class PagesUpdate(PagesBase):
 class Pages(PagesBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="pages")
+    maze_id: int | None = Field(default=None, foreign_key="maze.id")
+    # owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    # owner: User | None = Relationship(back_populates="pages")
+    # profile: list[Profile] = Relationship(back_populates="badges")
+    # Maze_id: Optional[int] = Field(default=None, foreign_key="Maze.id")
+    # maze: Optional[Maze] = Relationship(back_populates="pages")
+    # user: list["User"] = Relationship(back_populates="user", link_model=UserBadgeLink)
+
 
 
 class PagesOut(PagesBase):
@@ -261,7 +287,9 @@ class PagesOut(PagesBase):
 class PagessOut(SQLModel):
     data: list[PagesOut]
     count: int
-######################  Question ##################
+
+
+###
 class QuestionBase(SQLModel):
     id : int
     content: str = None
@@ -291,8 +319,13 @@ class QuestionUpdate(QuestionBase):
 class Question(QuestionBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="question")
+
+    page_id: int | None = Field(default=None, foreign_key="page.id")
+    # owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    # owner: User | None = Relationship(back_populates="question")
+
+    # page_id: Optional[int] = Field(default=None, foreign_key="pages.id")
+    # page: Optional["Pages"] = Relationship(back_populates="questions")
 
 
 class QuestionOut(QuestionBase):
@@ -303,43 +336,52 @@ class QuestionOut(QuestionBase):
 class QuestionsOut(SQLModel):
     data: list[QuestionOut]
     count: int
-######################  Badges ##################
-class BadgesBase(SQLModel):
+
+    
+######################  Badge ##################
+class BadgeBase(SQLModel):
     id : int
     title: str = None
     image: str
     
     
     
-class BadgesCreate(BadgesBase):
+class BadgeCreate(BadgeBase):
     id : int
     title: str = None
     image: str
     
 
 
-class BadgesUpdate(BadgesBase):
+class BadgeUpdate(BadgeBase):
     id : int  | None = None
     title: str | None = None
     image: str | None = None
     
 
 
-class Badges(BadgesBase, table=True):
+class Badge(BadgeBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="badges")
+    users: list["User"] = Relationship(back_populates="badges", link_model=UserBadgeLink)
+    # users: list["User"] = Relationship(back_populates="badges")
+
+    # owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    # owner: User | None = Relationship(back_populates="badges")
+    # profile: Optional[Profile] = Relationship(back_populates="badges")
+    
 
 
-class BadgesOut(BadgesBase):
+class BadgeOut(BadgeBase):
     id: int
     owner_id: int | None = None
 
 
-class BadgessOut(SQLModel):
-    data: list[BadgesOut]
+class BadgesOut(SQLModel):
+    data: list[BadgeOut]
     count: int
+
+
 ######################  tag  ##################
 class TagBase(SQLModel):
     id : int
@@ -363,8 +405,10 @@ class TagUpdate(TagBase):
 class Tag(TagBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="tags")
+    mazes: list["Maze"] = Relationship(back_populates="tags", link_model=MazeTagLink)
+    # owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    # owner: User | None = Relationship(back_populates="tags")
+    # mazes: List["Maze"] = Relationship(back_populates="tags")
 
 
 class TagOut(TagBase):
@@ -418,8 +462,8 @@ class ItemUpdate(ItemBase):
 class Item(ItemBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     title: str
-    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
-    owner: User | None = Relationship(back_populates="items")
+    # owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    # owner: User | None = Relationship(back_populates="items")
 
 
 # Properties to return via API, id is always required

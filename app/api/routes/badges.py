@@ -4,12 +4,12 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Message, Badges, BadgesCreate, BadgesOut, BadgessOut, BadgesUpdate
+from app.models import Message, Badge, BadgeCreate, BadgeOut, BadgesOut, BadgeUpdate
 
 router = APIRouter()
 
 
-@router.get("/", response_model=BadgessOut)
+@router.get("/", response_model=BadgeOut)
 def read_all_badges(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
@@ -17,32 +17,32 @@ def read_all_badges(
     Retrieve Badges.
     """
     if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Badges)
+        count_statement = select(func.count()).select_from(Badge)
         count = session.exec(count_statement).one()
-        statement = select(Badges).offset(skip).limit(limit)
+        statement = select(Badge).offset(skip).limit(limit)
     else:
         count_statement = (
             select(func.count())
-            .select_from(Badges)
-            .where(Badges.owner_id == current_user.id)
+            .select_from(Badge)
+            .where(Badge.owner_id == current_user.id)
         )
         count = session.exec(count_statement).one()
         statement = (
-            select(Badges)
-            .where(Badges.owner_id == current_user.id)
+            select(Badge)
+            .where(Badge.owner_id == current_user.id)
             .offset(skip)
             .limit(limit)
         )
-    badgess = session.exec(statement).all()
-    return BadgessOut(data=badgess, count=count)
+    badges = session.exec(statement).all()
+    return BadgesOut(data=badges, count=count)
 
 
-@router.get("/{id}", response_model=BadgesOut)
+@router.get("/{id}", response_model=BadgeOut)
 def read_user_badges(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     """
-    Get badges by ID.
+    Get badges by User ID.
     """
-    badges = session.get(Badges, id)
+    badges = session.get(Badge, id)
     if not badges:
         raise HTTPException(status_code=404, detail="Badge not found")
     if not current_user.is_superuser and (badges.owner_id != current_user.id):
@@ -50,14 +50,14 @@ def read_user_badges(session: SessionDep, current_user: CurrentUser, id: int) ->
     return badges
 
 
-@router.post("/", response_model=BadgesOut)
+@router.post("/", response_model=BadgeOut)
 def create_badge(
-    *, session: SessionDep, current_user: CurrentUser, badges_in: BadgesCreate
+    *, session: SessionDep, current_user: CurrentUser, badges_in: BadgeCreate
 ) -> Any:
     """
     Create a new badge.
     """
-    badge = Badges.model_validate(badges_in, update={"owner_id": current_user.id})
+    badge = Badge.model_validate(badges_in, update={"owner_id": current_user.id})
     session.add(badge)
     session.commit()
     session.refresh(badge)
@@ -67,14 +67,14 @@ def create_badge(
 
 
 
-@router.put("/{id}", response_model=BadgesOut)
+@router.put("/{id}", response_model=BadgeOut)
 def update_badge(
-    *, session: SessionDep, current_user: CurrentUser, id: int, badges_in: BadgesUpdate
+    *, session: SessionDep, current_user: CurrentUser, id: int, badges_in: BadgeUpdate
 ) -> Any:
     """
     Update a badge.
     """
-    badge = session.get(Badges, id)
+    badge = session.get(Badge, id)
     if not badge:
         raise HTTPException(status_code=404, detail="Badge not found")
     if not current_user.is_superuser and (badge.owner_id != current_user.id):
@@ -92,7 +92,7 @@ def delete_badge(session: SessionDep, current_user: CurrentUser, id: int) -> Mes
     """
     Delete a badge.
     """
-    badge = session.get(Badges, id)
+    badge = session.get(Badge, id)
     if not badge:
         raise HTTPException(status_code=404, detail="Badge not found")
     if badge.user_id != current_user.id:

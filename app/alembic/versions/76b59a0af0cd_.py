@@ -47,6 +47,7 @@ def upgrade():
     op.create_table('question',
     sa.Column('content', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('answer', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('answer_type', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('hint', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sqlmodel.sql.sqltypes.AutoString(), nullable=False),

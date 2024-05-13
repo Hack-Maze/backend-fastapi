@@ -49,6 +49,8 @@ def read_question(session: SessionDep, current_user: CurrentUser, id: int) -> An
         raise HTTPException(status_code=400, detail="Not enough permissions")
     return question
 
+# Create a question
+
 
 @router.post("/", response_model=QuestionOut)
 def create_question(
@@ -62,8 +64,6 @@ def create_question(
     session.commit()
     session.refresh(question)
     return question
-
-
 
 
 
