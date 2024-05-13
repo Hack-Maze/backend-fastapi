@@ -39,8 +39,6 @@ class Settings(BaseSettings):
     def server_host(self) -> str:
         # Use HTTPS for anything other than local development
         if self.ENVIRONMENT == "local":
-            print("#"*1000)
-            print(self.DOMAIN)
             return f"http://{self.DOMAIN}"
         return f"https://{self.DOMAIN}"
 

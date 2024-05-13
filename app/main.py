@@ -1,4 +1,3 @@
-import pysnooper
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.routing import APIRoute
@@ -33,8 +32,6 @@ if settings.BACKEND_CORS_ORIGINS:
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
-# XXX: for debugging check that the openapi schema is generated
-@pysnooper.snoop(max_variable_length=None)
 def debugging_openapi():
     # reference: https://fastapi.tiangolo.com/how-to/extending-openapi/#overriding-the-defaults
     if app.openapi_schema:
