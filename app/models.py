@@ -35,7 +35,6 @@ class UpdatePassword(SQLModel):
     new_password: str
 
 
-# Database model, database table inferred from class name
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
@@ -47,7 +46,6 @@ class User(UserBase, table=True):
     rooms: list["Room"] = Relationship(back_populates="owner")
     items: list["Item"] = Relationship(back_populates="owner")
     badges: list["Badge"] = Relationship(back_populates="owner")
-    friends: list["User"] = Relationship(back_populates="friends")
 
 
 # Properties to return via API, id is always required
