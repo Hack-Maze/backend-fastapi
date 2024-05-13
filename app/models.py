@@ -75,15 +75,15 @@ class ProfileBase(SQLModel):
 
 class ProfileCreate(ProfileBase):
     full_name: str
-    country: str
-    rank: int
-    level: int
-    bio: str
-    image: str
-    github_link: str
-    linkedin_link: str
-    personal_blog_link: str
-    job: str
+    country: str = "Egypt"
+    rank: int = 1
+    level: int = 1
+    bio: str = "I am a software engineer"
+    image: str = "https://example.com/image.jpg"
+    github_link: str = ""
+    linkedin_link: str = ""
+    personal_blog_link: str = "" 
+    job: str = "Software Engineer"
 
 
 class ProfileUpdate(ProfileBase):

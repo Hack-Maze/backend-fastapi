@@ -13,8 +13,7 @@ from app.models import (
     UserUpdate,
     Section,
     SectionCreate,
-    SectionUpdate
-    
+    SectionUpdate,
 )
 
 
@@ -25,6 +24,8 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)
+
+    create_profile(session=session, profile_create=ProfileCreate(full_name=db_obj.full_name), user_id=db_obj.id)
     return db_obj
 
 
@@ -80,7 +81,6 @@ def create_profile(
     return db_profile
 
 
-
 def create_section(*, session: Session, section_in: SectionCreate) -> Section:
     db_section = Section.model_validate(section_in)
     session.add(db_section)
@@ -93,7 +93,10 @@ def get_section_by_id(*, session: Session, section_id: int) -> Section | None:
     statement = select(Section).where(Section.id == section_id)
     return session.exec(statement).first()
 
-def update_section(*, session: Session, section_id: int, section_in: SectionUpdate) -> Any:
+
+def update_section(
+    *, session: Session, section_id: int, section_in: SectionUpdate
+) -> Any:
     db_section = get_section_by_id(session=session, section_id=section_id)
     if not db_section:
         return None
@@ -102,6 +105,7 @@ def update_section(*, session: Session, section_id: int, section_in: SectionUpda
     session.commit()
     session.refresh(db_section)
     return db_section
+
 
 def delete_section(*, session: Session, section_id: int) -> None:
     statement = select(Section).where(Section.id == section_id)
