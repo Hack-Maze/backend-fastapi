@@ -297,3 +297,36 @@ class ItemOut(ItemBase):
 class ItemsOut(SQLModel):
     data: list[ItemOut]
     count: int
+
+
+class BadgeBase(SQLModel):
+    title: str
+    image: str
+
+
+class BadgeCreate(BadgeBase):
+    title: str
+    image: str
+
+
+class BadgeUpdate(BadgeBase):
+    title: str | None = None
+    image: str | None = None
+
+
+class Badge(BadgeBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    image: str
+    owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
+    owner: User | None = Relationship(back_populates="badges")
+
+
+class BadgeOut(BadgeBase):
+    id: int
+    owner_id: int
+
+
+class BadgesOut(SQLModel):
+    data: list[BadgeOut]
+    count: int
