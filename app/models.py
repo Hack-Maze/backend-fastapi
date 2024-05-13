@@ -80,7 +80,7 @@ class ProfileCreate(ProfileBase):
     image: str = "https://example.com/image.jpg"
     github_link: str = ""
     linkedin_link: str = ""
-    personal_blog_link: str = "" 
+    personal_blog_link: str = ""
     job: str = "Software Engineer"
 
 
@@ -215,10 +215,16 @@ class Section(SectionBase, table=True):
     room_id: int | None = Field(default=None, foreign_key="room.id", nullable=False)
     room: Room | None = Relationship(back_populates="sections")
 
+    question_id: int | None = Field(
+        default=None, foreign_key="question.id", nullable=False
+    )
+    questions: list["Question"] = Relationship(back_populates="section")
+
 
 class SectionOut(SectionBase):
     id: int
     room_id: int | None = None
+    questions: list["Question"] = []
 
 
 class SectionsOut(SQLModel):
@@ -310,4 +316,48 @@ class BadgeOut(BadgeBase):
 
 class BadgesOut(SQLModel):
     data: list[BadgeOut]
+    count: int
+
+
+# create Question model and link to sections that have [content, answer, hint, answer_type]
+class QuestionBase(SQLModel):
+    content: str
+    answer: str
+    hint: str | None = None
+    answer_type: str
+
+
+class QuestionCreate(QuestionBase):
+    content: str
+    answer: str
+    hint: str | None = None
+    answer_type: str
+
+
+class QuestionUpdate(QuestionBase):
+    content: str | None = None
+    answer: str | None = None
+    hint: str | None = None
+    answer_type: str | None = None
+
+
+class Question(QuestionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    content: str
+    answer: str
+    hint: str | None = None
+    answer_type: str
+    section_id: int | None = Field(
+        default=None, foreign_key="section.id", nullable=False
+    )
+    section: Section | None = Relationship(back_populates="questions")
+
+
+class QuestionOut(QuestionBase):
+    id: int
+    section_id: int | None = None
+
+
+class QuestionsOut(SQLModel):
+    data: list[QuestionOut]
     count: int
