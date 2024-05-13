@@ -139,6 +139,7 @@ class RoomBase(SQLModel):
     title: str
     description: str | None = None
     difficulty: int
+    level: str  # Added level property
     is_active: bool
     recommended_video: str | None = None
     room_type: str
@@ -153,6 +154,7 @@ class RoomCreate(RoomBase):
     title: str
     description: str | None = None
     difficulty: int
+    level: str  # Added level property
     is_active: bool
     recommended_video: str | None = None
     room_type: str
@@ -167,6 +169,7 @@ class RoomUpdate(RoomBase):
     title: str | None = None
     description: str | None = None
     difficulty: int | None = None
+    level: str | None = None  # Added level property
     is_active: bool | None = None
     recommended_video: str | None = None
     room_type: str | None = None
@@ -182,15 +185,61 @@ class Room(RoomBase, table=True):
     title: str
     owner_id: int | None = Field(default=None, foreign_key="user.id", nullable=False)
     owner: User | None = Relationship(back_populates="rooms")
+    sections: list["Section"] = Relationship(back_populates="room")
 
 
 class RoomOut(RoomBase):
     id: int
     owner_id: int | None = None
+    sections: list["Section"] = []
 
 
 class RoomsOut(SQLModel):
     data: list[RoomOut]
+    count: int
+
+
+class SectionBase(SQLModel):
+    title: str
+    description: str | None = None
+    room_id: int
+    created_at: str
+    updated_at: str
+    deleted_at: str | None = None
+
+
+class SectionCreate(SectionBase):
+    title: str
+    description: str | None = None
+    room_id: int
+    created_at: str
+    updated_at: str
+    deleted_at: str | None = None
+
+
+class SectionUpdate(SectionBase):
+    title: str | None = None
+    description: str | None = None
+    room_id: int | None = None
+    created_at: str | None = None
+    updated_at: str | None = None
+    deleted_at: str | None = None
+
+
+class Section(SectionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    room_id: int | None = Field(default=None, foreign_key="room.id", nullable=False)
+    room: Room | None = Relationship(back_populates="sections")
+
+
+class SectionOut(SectionBase):
+    id: int
+    room_id: int | None = None
+
+
+class SectionsOut(SQLModel):
+    data: list[SectionOut]
     count: int
 
 
