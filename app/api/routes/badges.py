@@ -1,10 +1,7 @@
 from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, select
+from sqlmodel import func, select
 from app import crud
-from app.core.config import settings
-from app.core.security import get_password_hash, verify_password
-from app.utils import generate_new_account_email, send_email
 
 from app.api.deps import (
     CurrentUser,
@@ -18,14 +15,6 @@ from app.models import (
     BadgesOut,
     BadgeUpdate,
     Message,
-    UpdatePassword,
-    User,
-    UserCreate,
-    UserCreateOpen,
-    UserOut,
-    UsersOut,
-    UserUpdate,
-    UserUpdateMe,
 )
 
 router = APIRouter()
@@ -46,6 +35,17 @@ def read_badges(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     badges = session.exec(statement).all()
 
     return BadgesOut(data=badges, count=count)
+
+
+@router.get("/{badge_id}", response_model=BadgeOut)
+def read_badge_by_id(session: SessionDep, badge_id: int) -> Any:
+    """
+    Get badge by ID.
+    """
+    badge = session.get(Badge, badge_id)
+    if not badge:
+        raise HTTPException(status_code=404, detail="Badge not found")
+    return badge
 
 
 @router.post(
