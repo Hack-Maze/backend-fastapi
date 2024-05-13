@@ -14,6 +14,11 @@ from app.models import (
     Section,
     SectionCreate,
     SectionUpdate,
+    Badge,
+    BadgeCreate,
+    Question,
+    QuestionCreate,
+    QuestionUpdate,
 )
 
 
@@ -25,7 +30,11 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
     session.commit()
     session.refresh(db_obj)
 
-    create_profile(session=session, profile_create=ProfileCreate(full_name=db_obj.full_name), user_id=db_obj.id)
+    create_profile(
+        session=session,
+        profile_create=ProfileCreate(full_name=db_obj.full_name),
+        user_id=db_obj.id,
+    )
     return db_obj
 
 
@@ -111,5 +120,59 @@ def delete_section(*, session: Session, section_id: int) -> None:
     statement = select(Section).where(Section.id == section_id)
     db_section = session.exec(statement).first()
     session.delete(db_section)
+    session.commit()
+    return None
+
+
+def get_badge_by_name(*, session: Session, name: str) -> Badge | None:
+    statement = select(Badge).where(Badge.name == name)
+    return session.exec(statement).first()
+
+
+def create_badge(*, session: Session, badge_create: BadgeCreate) -> Badge:
+    db_badge = Badge.model_validate(badge_create)
+    session.add(db_badge)
+    session.commit()
+    session.refresh(db_badge)
+    return db_badge
+
+
+def update_badge(*, session: Session, db_badge: Badge, badge_in: BadgeCreate) -> Any:
+    badge_data = badge_in.model_dump(exclude_unset=True)
+    db_badge.sqlmodel_update(badge_data)
+    session.add(db_badge)
+    session.commit()
+    session.refresh(db_badge)
+    return db_badge
+
+
+def get_question_by_name(*, session: Session, name: str) -> Question | None:
+    statement = select(Question).where(Question.name == name)
+    return session.exec(statement).first()
+
+
+def create_question(*, session: Session, question_in: QuestionCreate) -> Question:
+    db_question = Question.model_validate(question_in)
+    session.add(db_question)
+    session.commit()
+    session.refresh(db_question)
+    return db_question
+
+
+def update_question(
+    *, session: Session, db_question: Question, question_in: QuestionUpdate
+) -> Any:
+    question_data = question_in.model_dump(exclude_unset=True)
+    db_question.sqlmodel_update(question_data)
+    session.add(db_question)
+    session.commit()
+    session.refresh(db_question)
+    return db_question
+
+
+def delete_question(*, session: Session, question_id: int) -> None:
+    statement = select(Question).where(Question.id == question_id)
+    db_question = session.exec(statement).first()
+    session.delete(db_question)
     session.commit()
     return None
