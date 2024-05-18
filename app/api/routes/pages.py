@@ -4,12 +4,12 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 from sqlmodel import func, select
 
 from app.api.deps import CurrentUser, SessionDep
-from app.models import Message, Pages, PagesCreate, PagesOut, PagessOut, PagesUpdate
+from app.models import Message, Page, PageCreate, PagesOut, PagesOut, PageUpdate
 
 router = APIRouter()
 
 
-@router.get("/", response_model=PagessOut)
+@router.get("/", response_model=PagesOut)
 def read_pages(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
@@ -17,24 +17,24 @@ def read_pages(
     Retrieve pages.
     """
     if current_user.is_superuser:
-        count_statement = select(func.count()).select_from(Pages)
+        count_statement = select(func.count()).select_from(Page)
         count = session.exec(count_statement).one()
-        statement = select(Pages).offset(skip).limit(limit)
+        statement = select(Page).offset(skip).limit(limit)
     else:
         count_statement = (
             select(func.count())
-            .select_from(Pages)
-            .where(Pages.owner_id == current_user.id)
+            .select_from(Page)
+            .where(Page.owner_id == current_user.id)
         )
         count = session.exec(count_statement).one()
         statement = (
-            select(Pages)
-            .where(Pages.owner_id == current_user.id)
+            select(Page)
+            .where(Page.owner_id == current_user.id)
             .offset(skip)
             .limit(limit)
         )
     pagess = session.exec(statement).all()
-    return PagessOut(data=pagess, count=count)
+    return PagesOut(data=pagess, count=count)
 
 
 @router.get("/{id}", response_model=PagesOut)
@@ -42,7 +42,7 @@ def read_page(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
     """
     Get Page by ID.
     """
-    pages = session.get(Pages, id)
+    pages = session.get(Page, id)
     if not pages:
         raise HTTPException(status_code=404, detail="Page not found")
     if not current_user.is_superuser and (pages.owner_id != current_user.id):
@@ -52,12 +52,12 @@ def read_page(session: SessionDep, current_user: CurrentUser, id: int) -> Any:
 
 @router.post("/", response_model=PagesOut)
 def create_page(
-    *, session: SessionDep, current_user: CurrentUser, pages_in: PagesCreate
+    *, session: SessionDep, current_user: CurrentUser, pages_in: PageCreate
 ) -> Any:
     """
     Create a new Page.
     """
-    pages = Pages.model_validate(pages_in, update={"owner_id": current_user.id})
+    pages = Page.model_validate(pages_in, update={"owner_id": current_user.id})
     session.add(pages)
     session.commit()
     session.refresh(pages)
@@ -65,12 +65,12 @@ def create_page(
 
 @router.put("/{id}", response_model=PagesOut)
 def update_page(
-    *, session: SessionDep, current_user: CurrentUser, id: int, pages_in: PagesUpdate
+    *, session: SessionDep, current_user: CurrentUser, id: int, pages_in: PageUpdate
 ) -> Any:
     """
     Update a page.
     """
-    pages = session.get(Pages, id)
+    pages = session.get(Page, id)
     if not pages:
         raise HTTPException(status_code=404, detail="Page not found")
     if not current_user.is_superuser and (pages.owner_id != current_user.id):
@@ -89,7 +89,7 @@ def delete_page(session: SessionDep, current_user: CurrentUser, id: int) -> Mess
     Delete a page.
     """
   # Correct indentation
-    pages = session.get(Pages, id)
+    pages = session.get(Page, id)
     if not pages:
         raise HTTPException(status_code=404, detail="Page not found")
     if pages.user_id != current_user.id:
